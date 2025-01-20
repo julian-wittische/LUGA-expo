@@ -9,9 +9,12 @@
 # Script purpose: loading needed libraries & data, and prepare data for analysis
 ################################################################################
 
+library(beepr) # remove once complete
+
 ############ Libraries
 library(sf) # load and manipulate GIS vector objects
 library(rgeoboundaries) # administrative borders
+library(terra)
 
 ############ Working directory
 setwd("W:/01_Services/SCR_Informations Patrimoine Naturel/_Julian")
@@ -23,7 +26,7 @@ DATA_PATH <- "./PlantDivLuxExpo"
 
 ### Load all .csv files from data_dir
 files <- list.files(DATA_PATH, full.names = TRUE, pattern="*.csv")
-mdata <- do.call(rbind, lapply(files, function(x) read.csv(x, encoding="latin1")))
+mdata <- do.call(rbind, lapply(files, function(x) read.csv(x, encoding="latin1"))) #4.5min
 
 ### Keep only strict minimum columns
 mini <- mdata[,c("Lat", "Long", "date_start", "preferred",
@@ -48,7 +51,9 @@ country_borders <- geoboundaries("Luxembourg", adm_lvl = 0)
 # Check CRS
 st_crs(country_borders)
 plants_sf <- st_intersection(plants_sf, country_borders)
+country_borders_2169 <- st_transform(country_borders, 2169)
 plants_sf <- st_transform(plants_sf, 2169)
+plants_sf <- st_intersection(plants_sf, country_borders_2169)
 
 # Export in a GIS friendly format
 saveRDS(plants_sf, file="W:/01_Services/SCR_Informations Patrimoine Naturel/_Julian/PlantDivLuxExpo/plants_sf.RDS")
@@ -58,6 +63,8 @@ saveRDS(plants_sf, file="W:/01_Services/SCR_Informations Patrimoine Naturel/_Jul
 
 IMP <- rast("./_ENV_DATA_EUROPE/RastersLuxHighestResolution/LUX_IMP_10m.grd")
 ### Use a mask with a reformatted sf object
-country_borders_2169 <- st_transform(country_borders, 2169)
+
 IMP_lux <- mask(IMP, vect(country_borders_2169), touches = TRUE) #inclusive
 saveRDS(IMP_lux, file="W:/01_Services/SCR_Informations Patrimoine Naturel/_Julian/PlantDivLuxExpo/IMP_lux.RDS")
+
+beep(11)
