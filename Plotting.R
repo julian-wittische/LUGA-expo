@@ -20,8 +20,8 @@ library(ggplot2) # keep: plotting
 library(tidyverse)
 
 ############ Preprocessed data
-IMP_terra <- readRDS("./PlantDivLuxExpo/IMP_lux.RDS")
-plants_sf1 <- readRDS("./PlantDivLuxExpo/plants_sf.RDS")
+IMP_terra <- readRDS("./LUGA-expo-DATA/IMP_lux.RDS")
+plants_sf1 <- readRDS("./LUGA-expo-DATA/plants_sf.RDS")
 
 
 

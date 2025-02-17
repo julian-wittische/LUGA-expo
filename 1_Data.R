@@ -1,28 +1,17 @@
-################################################################################
-# GOAL: explore plant diversity in Luxembourg and relate it to human footprint #
-################################################################################
+######################## PROJECT: LUGA expo analysis
 # Author: Julian Wittische (Musée National d'Histoire Naturelle Luxembourg)
 # Request: Laura Daco/Thierry Helminger
-# Start: Winter 2024
-# Data: MDATA
-################################################################################
-# Script purpose: loading needed libraries & data, and prepare data for analysis
-################################################################################
+# Start: Spring 2025
+# Data: MNHNL
+# Script objective : Load and clean up data
 
-library(beepr) # remove once complete
+############ Local configuration ----
+source("config.R")
 
-############ Libraries
-library(sf) # load and manipulate GIS vector objects
-library(rgeoboundaries) # administrative borders
-library(terra)
+############ Loading libraries ----
+source("0_Libraries.R")
 
-############ Working directory
-setwd("W:/01_Services/SCR_Informations Patrimoine Naturel/_Julian")
-
-############ Loading MDATA plant data
-
-### MDATA data directory
-DATA_PATH <- "./PlantDivLuxExpo"
+############ Loading data ----
 
 ### Load all .csv files from data_dir
 files <- list.files(DATA_PATH, full.names = TRUE, pattern="*.csv")
@@ -30,9 +19,9 @@ mdata <- do.call(rbind, lapply(files, function(x) read.csv(x, encoding="latin1")
 
 ### Keep only strict minimum columns
 mini <- mdata[,c("Lat", "Long", "date_start", "preferred",
-                  "Taxon_Kingdom", "Taxon_Phylum",
-                  "Taxon_Class", "Taxon_Order",
-                  "Taxon_Family", "Taxon_Genus")]
+                 "Taxon_Kingdom", "Taxon_Phylum",
+                 "Taxon_Class", "Taxon_Order",
+                 "Taxon_Family", "Taxon_Genus")]
 
 ### Keep only observations with species ID and coordinates
 mini <- mini[complete.cases(mini$Lat),]
@@ -68,3 +57,4 @@ IMP_lux <- mask(IMP, vect(country_borders_2169), touches = TRUE) #inclusive
 saveRDS(IMP_lux, file="W:/01_Services/SCR_Informations Patrimoine Naturel/_Julian/PlantDivLuxExpo/IMP_lux.RDS")
 
 beep(11)
+
