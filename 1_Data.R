@@ -13,9 +13,30 @@ source("0_Libraries.R")
 
 ############ Loading data ----
 
-### Load all .csv files from data_dir
+###### Load all .csv files from data_dir
 files <- list.files(DATA_PATH, full.names = TRUE, pattern="*.csv")
 mdata <- do.call(rbind, lapply(files, function(x) read.csv(x, encoding="latin1"))) #4.5min
+beep(4)
+
+############ Laura's wishlist ----
+
+###### Select only data from 01/01/2005
+
+post2004 <- mdata
+### Try parsing based on the two formats present in the dataset
+post2004$date_end <- parse_date_time(post2004$date_end, orders = c("d/m/Y", "Y-m-d"))
+table(is.na(post2004$date_end))
+
+### Identify rows where parsing failed and replace them by the first date in the Sample_Date column
+post2004[is.na(post2004$date_end), "date_end"] <- parse_date_time(str_sub(post2004[is.na(post2004$date_end), "Sample_Date"], -10, -1), orders = c("Y-m-d"))
+# Checkpoint
+which(is.na(post2004$date_end))
+### Subset by date
+post2004 <- subset(post2004, date_end >= as.Date("01/01/2005", "%d/%m/%Y"))
+
+
+
+
 
 ### Keep only strict minimum columns
 mini <- mdata[,c("Lat", "Long", "date_start", "preferred",

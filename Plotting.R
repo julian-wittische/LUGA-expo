@@ -16,8 +16,6 @@
 library(sf) # keep: vector GIS
 library(terra) # keep: raster GIS
 library(exactextractr) # keep: extract at locations
-library(ggplot2) # keep: plotting
-library(tidyverse)
 
 ############ Preprocessed data
 IMP_terra <- readRDS("./LUGA-expo-DATA/IMP_lux.RDS")
