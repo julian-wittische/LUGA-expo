@@ -16,44 +16,55 @@ source("0_Libraries.R")
 ###### Load all .csv files from data_dir
 files <- list.files(DATA_PATH, full.names = TRUE, pattern="*.csv")
 mdata <- do.call(rbind, lapply(files, function(x) read.csv(x, encoding="latin1"))) #4.5min
-beep(4)
+
+###### Keep only observations with species ID and coordinates
+mdata <- mdata[complete.cases(mdata$Lat),]
+mdata <- mdata[complete.cases(mdata$Long),]
+mdata <- mdata[complete.cases(mdata$preferred),]
 
 ############ Laura's wishlist ----
 
 ###### Select only data from 01/01/2005
 
-post2004 <- mdata
+post04 <- mdata
 ### Try parsing based on the two formats present in the dataset
-post2004$date_end <- parse_date_time(post2004$date_end, orders = c("d/m/Y", "Y-m-d"))
-table(is.na(post2004$date_end))
+post04$date_end <- parse_date_time(post04$date_end, orders = c("d/m/Y", "Y-m-d"))
+table(is.na(post04$date_end))
 
 ### Identify rows where parsing failed and replace them by the first date in the Sample_Date column
-post2004[is.na(post2004$date_end), "date_end"] <- parse_date_time(str_sub(post2004[is.na(post2004$date_end), "Sample_Date"], -10, -1), orders = c("Y-m-d"))
+post04[is.na(post04$date_end), "date_end"] <- parse_date_time(str_sub(post04[is.na(post04$date_end), "Sample_Date"], -10, -1), orders = c("Y-m-d"))
 # Checkpoint
-which(is.na(post2004$date_end))
+which(is.na(post04$date_end))
 ### Subset by date
-post2004 <- subset(post2004, date_end >= as.Date("01/01/2005", "%d/%m/%Y"))
+post04 <- subset(post04, date_end >= as.Date("01/01/2005", "%d/%m/%Y"))
 
+###### Select only birds
+post04_birds <- post04[post04$Taxon_Class=="Aves",]
+# Checkpoint
+dim(post04_birds)
 
+###### Select only vascular plants
+plants <- post04[post04$Taxon_Kingdom=="Plantae",]
+table(plants$Taxon_Phylum)
+### Choose the right ones
+post04_vasc <- post04[post04$Taxon_Phylum%in%c("Lycopodiophyta", "Magnoliophyta",
+                                               "Pinophyta", "Pteridophyta", "Tracheophyta"),]
+# Checkpoint
+dim(post04_vascu)
 
+###### Select only invertebrates
+animals <- post04[post04$Taxon_Kingdom=="Animalia",]
+post04_inver <- post04[!(animals$Taxon_Class%in%c("Mammalia", "Aves", "Amphibia",
+                                                 "Actinopterygii", "Agnatha",
+                                                 "Osteichthyes", "Reptilia")),]
+# Checkpoint
+dim(post04_inver)
 
-
-### Keep only strict minimum columns
-mini <- mdata[,c("Lat", "Long", "date_start", "preferred",
-                 "Taxon_Kingdom", "Taxon_Phylum",
-                 "Taxon_Class", "Taxon_Order",
-                 "Taxon_Family", "Taxon_Genus")]
-
-### Keep only observations with species ID and coordinates
-mini <- mini[complete.cases(mini$Lat),]
-mini <- mini[complete.cases(mini$Long),]
-mini <- mini[complete.cases(mini$preferred),]
-
-### Keep only plants
-plants <- mini[mini$Taxon_Kingdom=="Plantae",]
-
-### Make it an sf object
-plants_sf <- st_as_sf(plants, coords = c("Long", "Lat"), crs = 4326)
+###### Make them an sf objects
+post04_sf <- st_as_sf(post04, coords = c("Long", "Lat"), crs = 4326)
+post04_birds_sf <- st_as_sf(post04_birds, coords = c("Long", "Lat"), crs = 4326)
+post04_vasc_sf <- st_as_sf(post04_vasc, coords = c("Long", "Lat"), crs = 4326)
+post04_inver_sf <- st_as_sf(post04_inver, coords = c("Long", "Lat"), crs = 4326)
 
 ### Limit to Luxembourg centroids
 # Download boundary
