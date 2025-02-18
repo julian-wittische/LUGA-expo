@@ -1,26 +1,3 @@
-################################################################################
-# GOAL: explore plant diversity in Luxembourg and relate it to human footprint #
-################################################################################
-# Author: Julian Wittische (Musée National d'Histoire Naturelle Luxembourg)
-# Request: Laura Daco/Thierry Helminger
-# Start: Winter 2024
-# Data: MDATA
-################################################################################
-# Script purpose: plotting of plant and environmental spatial data
-################################################################################
-
-############ RUN ONCE (CHANGE DATA PATHS)
-#source("Preprocessing.R")
-
-############ Libraries
-library(sf) # keep: vector GIS
-library(terra) # keep: raster GIS
-library(exactextractr) # keep: extract at locations
-
-############ Preprocessed data
-IMP_terra <- readRDS("./LUGA-expo-DATA/IMP_lux.RDS")
-plants_sf1 <- readRDS("./LUGA-expo-DATA/plants_sf.RDS")
-
 
 
 ################################################################################

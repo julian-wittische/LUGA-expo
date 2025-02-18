@@ -11,10 +11,10 @@ source("config.R")
 ############ Loading libraries ----
 source("0_Libraries.R")
 
-############ Loading data ----
+############ Prepare data ----
 
 ###### Load all .csv files from data_dir
-files <- list.files(DATA_PATH, full.names = TRUE, pattern="*.csv")
+files <- list.files(paste0(DATA_PATH, "/_Julian/LUGA-expo-DATA"), full.names = TRUE, pattern="*.csv")
 mdata <- do.call(rbind, lapply(files, function(x) read.csv(x, encoding="latin1"))) #4.5min
 
 ###### Keep only observations with species ID and coordinates
@@ -22,9 +22,7 @@ mdata <- mdata[complete.cases(mdata$Lat),]
 mdata <- mdata[complete.cases(mdata$Long),]
 mdata <- mdata[complete.cases(mdata$preferred),]
 
-############ Laura's wishlist ----
-
-###### Select only data from 01/01/2005
+############ Select only data from 01/01/2005 ----
 
 post04 <- mdata
 ### Try parsing based on the two formats present in the dataset
@@ -38,55 +36,45 @@ which(is.na(post04$date_end))
 ### Subset by date
 post04 <- subset(post04, date_end >= as.Date("01/01/2005", "%d/%m/%Y"))
 
-###### Select only birds
-post04_birds <- post04[post04$Taxon_Class=="Aves",]
-# Checkpoint
-dim(post04_birds)
+############ Make them an sf objects and clean up ----
 
-###### Select only vascular plants
-plants <- post04[post04$Taxon_Kingdom=="Plantae",]
-table(plants$Taxon_Phylum)
-### Choose the right ones
-post04_vasc <- post04[post04$Taxon_Phylum%in%c("Lycopodiophyta", "Magnoliophyta",
-                                               "Pinophyta", "Pteridophyta", "Tracheophyta"),]
-# Checkpoint
-dim(post04_vascu)
-
-###### Select only invertebrates
-animals <- post04[post04$Taxon_Kingdom=="Animalia",]
-post04_inver <- post04[!(animals$Taxon_Class%in%c("Mammalia", "Aves", "Amphibia",
-                                                 "Actinopterygii", "Agnatha",
-                                                 "Osteichthyes", "Reptilia")),]
-# Checkpoint
-dim(post04_inver)
-
-###### Make them an sf objects
+### Switch to sf class
 post04_sf <- st_as_sf(post04, coords = c("Long", "Lat"), crs = 4326)
-post04_birds_sf <- st_as_sf(post04_birds, coords = c("Long", "Lat"), crs = 4326)
-post04_vasc_sf <- st_as_sf(post04_vasc, coords = c("Long", "Lat"), crs = 4326)
-post04_inver_sf <- st_as_sf(post04_inver, coords = c("Long", "Lat"), crs = 4326)
 
 ### Limit to Luxembourg centroids
 # Download boundary
 country_borders <- geoboundaries("Luxembourg", adm_lvl = 0)
-# Check CRS
-st_crs(country_borders)
-plants_sf <- st_intersection(plants_sf, country_borders)
-country_borders_2169 <- st_transform(country_borders, 2169)
-plants_sf <- st_transform(plants_sf, 2169)
-plants_sf <- st_intersection(plants_sf, country_borders_2169)
+# Remove areas outside Luxembourg
+post04_sf <- st_intersection(post04_sf, country_borders)
 
-# Export in a GIS friendly format
-saveRDS(plants_sf, file="W:/01_Services/SCR_Informations Patrimoine Naturel/_Julian/PlantDivLuxExpo/plants_sf.RDS")
+# Takes forever
+# Change CRS
+post04_sf <- st_transform(post04_sf, 2169)
+beep(4)
+############ Select only birds ----
+post04_birds_sf <- post04_sf[post04_sf$Taxon_Class=="Aves",]
+
+############ Select only vascular plants ----
+post04_vasc_sf <- post04_sf[post04_sf$Taxon_Phylum%in%c("Lycopodiophyta", "Magnoliophyta",
+                                               "Pinophyta", "Pteridophyta", "Tracheophyta"),]
+############ Select only invertebrates ----
+animals <- post04_sf[post04_sf$Taxon_Kingdom=="Animalia",]
+post04_inver_sf <- animals[!(animals$Taxon_Class%in%c("Mammalia", "Aves", "Amphibia",
+                                                 "Actinopterygii", "Agnatha",
+                                                 "Osteichthyes", "Reptilia")),]
+############ Neobiota ----
+neobiota <- read.csv(paste0(DATA_PATH,"/_ENV_DATA_LUX/neobiota_recorder_list.csv"), encoding="latin1")
+
+############ Imperviousness ----
+IMP <- rast(paste0(DATA_PATH,"/_ENV_DATA_LUX/RastersLuxHighestResolution/LUX_IMP_10m.grd"))
+### Change the CRS
+country_borders_2169 <- st_transform(country_borders, 2169)
+### Use a mask with a reformatted sf object
+IMP_lux <- mask(IMP, vect(country_borders_2169), touches = TRUE) #inclusive
+
+############ Save ready-to-use spatial objects ----
+save(post04_sf, post04_birds_sf, post04_vasc_sf, post04_inver_sf, IMP_lux, neobiota, file=paste0(DATA_PATH, "/_Julian/LUGA-expo-DATA/ready.RData"))
 #FOR ESRI: write_sf(plants_sf, "LUX_PLANTS.shp")
 
-############ Loading of ready-to-use spatial objects
-
-IMP <- rast("./_ENV_DATA_EUROPE/RastersLuxHighestResolution/LUX_IMP_10m.grd")
-### Use a mask with a reformatted sf object
-
-IMP_lux <- mask(IMP, vect(country_borders_2169), touches = TRUE) #inclusive
-saveRDS(IMP_lux, file="W:/01_Services/SCR_Informations Patrimoine Naturel/_Julian/PlantDivLuxExpo/IMP_lux.RDS")
-
-beep(11)
+beep(4)
 
