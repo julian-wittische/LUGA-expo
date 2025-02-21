@@ -44,6 +44,8 @@ post04_sf <- st_as_sf(post04, coords = c("Long", "Lat"), crs = 4326)
 ### Limit to Luxembourg centroids
 # Download boundary
 country_borders <- geoboundaries("Luxembourg", adm_lvl = 0)
+# Change the CRS
+country_borders_2169 <- st_transform(country_borders, 2169)
 # Remove areas outside Luxembourg
 post04_sf <- st_intersection(post04_sf, country_borders)
 
@@ -65,15 +67,8 @@ post04_inver_sf <- animals[!(animals$Taxon_Class%in%c("Mammalia", "Aves", "Amphi
 ############ Neobiota ----
 neobiota <- read.csv(paste0(DATA_PATH,"/_ENV_DATA_LUX/neobiota_recorder_list.csv"), encoding="latin1")
 
-############ Imperviousness ----
-IMP <- rast(paste0(DATA_PATH,"/_ENV_DATA_LUX/RastersLuxHighestResolution/LUX_IMP_10m.grd"))
-### Change the CRS
-country_borders_2169 <- st_transform(country_borders, 2169)
-### Use a mask with a reformatted sf object
-IMP_lux <- mask(IMP, vect(country_borders_2169), touches = TRUE) #inclusive
-
 ############ Save ready-to-use spatial objects ----
-save(post04_sf, post04_birds_sf, post04_vasc_sf, post04_inver_sf, IMP_lux, neobiota, file=paste0(DATA_PATH, "/_Julian/LUGA-expo-DATA/ready.RData"))
+save(post04_sf, post04_birds_sf, post04_vasc_sf, post04_inver_sf, neobiota, country_borders_2169, file=paste0(DATA_PATH, "/_Julian/LUGA-expo-DATA/ready.RData"))
 #FOR ESRI: write_sf(plants_sf, "LUX_PLANTS.shp")
 
 beep(4)
