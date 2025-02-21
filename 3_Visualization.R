@@ -42,3 +42,10 @@ mapviz(inver, IMP)
 mapviz(inver, observations)
 mapviz(inver, species)
 mapviz(inver, speciesPobs)
+
+######
+mapviz(neo, Observations)
+mapviz(neo, observations)
+mapviz(neo, species)
+mapviz(neo, speciesPobs)
+

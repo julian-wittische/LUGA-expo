@@ -49,10 +49,9 @@ country_borders_2169 <- st_transform(country_borders, 2169)
 # Remove areas outside Luxembourg
 post04_sf <- st_intersection(post04_sf, country_borders)
 
-# Takes forever
 # Change CRS
 post04_sf <- st_transform(post04_sf, 2169)
-beep(4)
+
 ############ Select only birds ----
 post04_birds_sf <- post04_sf[post04_sf$Taxon_Class=="Aves",]
 
@@ -65,10 +64,13 @@ post04_inver_sf <- animals[!(animals$Taxon_Class%in%c("Mammalia", "Aves", "Amphi
                                                  "Actinopterygii", "Agnatha",
                                                  "Osteichthyes", "Reptilia")),]
 ############ Neobiota ----
+####### Load list
 neobiota <- read.csv(paste0(DATA_PATH,"/_ENV_DATA_LUX/neobiota_recorder_list.csv"), encoding="latin1")
+####### Keep only rows of original dataset that have their species name in list
+post04_neo_sf <- post04_sf[post04_sf$preferred%in%neobiota$ITEM_NAME,]
 
 ############ Save ready-to-use spatial objects ----
-save(post04_sf, post04_birds_sf, post04_vasc_sf, post04_inver_sf, neobiota, country_borders_2169, file=paste0(DATA_PATH, "/_Julian/LUGA-expo-DATA/ready.RData"))
+save(post04_sf, post04_birds_sf, post04_vasc_sf, post04_inver_sf, neo, country_borders_2169, file=paste0(DATA_PATH, "/_Julian/LUGA-expo-DATA/ready.RData"))
 #FOR ESRI: write_sf(plants_sf, "LUX_PLANTS.shp")
 
 beep(4)
