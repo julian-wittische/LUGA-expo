@@ -70,8 +70,7 @@ neobiota <- read.csv(paste0(DATA_PATH,"/_ENV_DATA_LUX/neobiota_recorder_list.csv
 post04_neo_sf <- post04_sf[post04_sf$preferred%in%neobiota$ITEM_NAME,]
 
 ############ Save ready-to-use spatial objects ----
-save(post04_sf, post04_birds_sf, post04_vasc_sf, post04_inver_sf, neo, country_borders_2169, file=paste0(DATA_PATH, "/_Julian/LUGA-expo-DATA/ready.RData"))
-#FOR ESRI: write_sf(plants_sf, "LUX_PLANTS.shp")
+save(post04_sf, post04_birds_sf, post04_vasc_sf, post04_inver_sf, post04_neo_sf , country_borders_2169, file=paste0(DATA_PATH, "/_Julian/LUGA-expo-DATA/OriginalData.RData"))
 
 beep(4)
 

@@ -6,7 +6,8 @@
 # Script objective : Model the relationship between imperviousness and biodiv metrics
 
 ############ Loading metrics ----
-source("2_Metrics.R")
+# This comes from 2_Metrics.R
+load(paste0(DATA_PATH, "/_Julian/LUGA-expo-DATA/Metrics.RData"))
 
 ############ All
 mod <- lm(observations ~ IMP, data=all)

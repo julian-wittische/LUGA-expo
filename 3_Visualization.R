@@ -6,46 +6,35 @@
 # Script objective : Visualize biodiversity metrics
 
 ############ Loading metrics ----
-source("2_Metrics.R")
+# This comes from 2_Metrics.R
+load(paste0(DATA_PATH, "/_Julian/LUGA-expo-DATA/Metrics.RData"))
 
 ############ Visualization of metrics ----
 
-###### General visualisation function
-mapviz <- function(metrics_df, metric){
-  map <- ggplot(metrics_df) +
-    geom_sf(aes(fill = {{metric}})) +
-    scale_fill_viridis_c(na.value = "transparent") +
-    theme_minimal()
-  return(map)
-}
-
-######
+###### Spatial environment
 mapviz(all, IMP)
+
+###### All taxa
 mapviz(all, observations)
 mapviz(all, species)
 mapviz(all, speciesPobs)
 
-######
-mapviz(birds, IMP)
+###### Birds
 mapviz(birds, observations)
 mapviz(birds, species)
 mapviz(birds, speciesPobs)
 
-######
-mapviz(vasc, IMP)
+###### Vascular plants
 mapviz(vasc, observations)
 mapviz(vasc, species)
 mapviz(vasc, speciesPobs)
 
-######
-mapviz(inver, IMP)
+###### Invertebrates
 mapviz(inver, observations)
 mapviz(inver, species)
 mapviz(inver, speciesPobs)
 
-######
-mapviz(neo, Observations)
+###### Neobiota
 mapviz(neo, observations)
 mapviz(neo, species)
 mapviz(neo, speciesPobs)
-

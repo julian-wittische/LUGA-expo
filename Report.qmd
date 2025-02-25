@@ -1,0 +1,134 @@
+---
+title: "LUGA expo: urbanisation and biodiversity"
+author: "Julian Wittische"
+format: html
+editor: visual
+execute:
+  echo: false
+  warning: false
+  message: false
+  results: hide
+---
+
+## Maps
+
+Biodiversity data is from end of 2024 mdata. Imperviousness data is from Copernicus from 2018.
+
+```{r setup, include=FALSE}
+source("config.R")
+source("functions.R")
+source("0_Libraries.R")
+load(paste0(DATA_PATH, "/_Julian/LUGA-expo-DATA/Metrics.RData"))
+```
+```{r}
+#| label: fig-imp
+#| fig-cap: "Imperviousness percentage in Luxembourg in 2018."
+mapviz(all, IMP)
+```
+<div style="height: 3cm;"></div>
+```{r}
+#| label: fig-all-obs
+#| fig-cap: "Number of observations (all taxa)."
+
+mapviz(all, observations)
+```
+<div style="height: 3cm;"></div>
+```{r}
+#| label: fig-all-spe
+#| fig-cap: "Number of species (all taxa)."
+mapviz(all, species)
+```
+<div style="height: 3cm;"></div>
+```{r}
+#| label: fig-all-spc
+#| fig-cap: "Number of species corrected by the number of observations (all taxa)."
+mapviz(all, speciesPobs)
+```
+<div style="height: 3cm;"></div>
+```{r}
+#| label: fig-birds-obs
+#| fig-cap: "Number of observations (birds)."
+mapviz(birds, observations)
+```
+<div style="height: 3cm;"></div>
+```{r}
+#| label: fig-birds-spe
+#| fig-cap: "Number of species (birds)."
+mapviz(birds, species)
+```
+<div style="height: 3cm;"></div>
+```{r}
+#| label: fig-birds-spc
+#| fig-cap: "Number of species corrected by the number of observations (birds)."
+mapviz(birds, speciesPobs)
+```
+<div style="height: 3cm;"></div>
+```{r}
+#| label: fig-vasc-obs
+#| fig-cap: "Number of observations (vascular plants)."
+mapviz(vasc, observations)
+```
+<div style="height: 3cm;"></div>
+```{r}
+#| label: fig-vasc-spe
+#| fig-cap: "Number of species (vascular plants)."
+mapviz(vasc, species)
+```
+<div style="height: 3cm;"></div>
+```{r}
+#| label: fig-vasc-spc
+#| fig-cap: "Number of species corrected by the number of observations (vascular plants)."
+mapviz(vasc, speciesPobs)
+```
+<div style="height: 3cm;"></div>
+```{r}
+#| label: fig-inver-obs
+#| fig-cap: "Number of observations (invertebrates)."
+mapviz(inver, observations)
+```
+<div style="height: 3cm;"></div>
+```{r}
+#| label: fig-inver-spe
+#| fig-cap: "Number of species (invertebrates)."
+mapviz(inver, species)
+```
+<div style="height: 3cm;"></div>
+```{r}
+#| label: fig-inver-spc
+#| fig-cap: "Number of species corrected by the number of observations (invertebrates)."
+mapviz(inver, speciesPobs)
+```
+<div style="height: 3cm;"></div>
+```{r}
+#| label: fig-neo-obs
+#| fig-cap: "Number of observations (neobiota)."
+mapviz(neo, observations)
+```
+<div style="height: 3cm;"></div>
+```{r}
+#| label: fig-neo-spe
+#| fig-cap: "Number of species (neobiota)."
+mapviz(neo, species)
+```
+<div style="height: 3cm;"></div>
+```{r}
+#| label: fig-neo-spc
+#| fig-cap: "Number of species corrected by the number of observations (neobiota)."
+mapviz(neo, speciesPobs)
+```
+
+## Model results
+
+We are using the number of species corrected by the number of observations and relating this variable to imperviousness. 
+
+Two points for your own sanity:
+
+1) I chose this metric because the number of observations is driven by human demography, and the number of species is driven by the number of observations (although this saturates more or less quickly for a large range of spatial scales).
+
+2) For simplicity I used linear regression instead of loess, etc. However, model diagnostics show that were violating linear regression theoretical assumptions.
+
+```{r}
+#| label: fig-neo-spc
+#| fig-cap: "Number of species corrected by the number of observations (neobiota)."
+mapviz(neo, speciesPobs)
+```
