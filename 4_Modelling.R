@@ -27,6 +27,11 @@ ggplot(all, aes(x = IMP, y = speciesPobs)) +
   geom_point() +
   stat_smooth(method = "lm", col = "red")
 
+ggplot(all2, aes(x = IMP, y = speciesPobs)) + 
+  geom_point() +
+  stat_smooth(method = "lm", col = "red")
+
+
 ############ Birds
 mod <- lm(observations ~ IMP, data=birds)
 summary(mod)

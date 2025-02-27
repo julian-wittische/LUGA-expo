@@ -18,6 +18,9 @@ mapviz(all, IMP)
 mapviz(all, observations)
 mapviz(all, species)
 mapviz(all, speciesPobs)
+all2 <- all
+all2[all2$speciesPobs=="NaN","speciesPobs"] <- 0
+mapviz(all2, speciesPobs)
 
 ###### Birds
 mapviz(birds, observations)
